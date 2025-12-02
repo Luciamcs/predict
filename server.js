@@ -3,13 +3,15 @@
 
 require("dotenv").config();
 
+const mongoose =require("mongoose");//para poder unirlo con la base de datos
+
 const express = require("express");
 const path = require("path");
 const predictRoutes = require("./routes/predictRoutes");
 const { initModel } = require("./services/tfModelService");
 
 const PORT = process.env.PORT || 3002;
-const MONGO_URI=process.env.MONGO_URI;
+const MONGO_URI=process.env.MONGO_URI || "mongodb://localhost:27017/prediction";
 
 const app = express();
 app.use(express.json());
@@ -27,9 +29,16 @@ app.listen(PORT, async () => {
   console.log(`[PREDICT] Servicio escuchando en ${serverUrl}`);
 
   try {
+    // Conectar a MongoDB
+    await mongoose.connect(MONGO_URI);
+    console.log("[PREDICT] Conexión a la base de datos establecida");
+
+    // Cargar modelo MLP
     await initModel(serverUrl);
+    console.log("[PREDICT] Modelo inicializado correctamente");
+
   } catch (err) {
-    console.error("Error al inicializar modelo:", err);
+    console.error("Error al inicializar servicio PREDICT:", err);
     process.exit(1);
   }
 });
