@@ -51,24 +51,24 @@ async function doPredict(req, res) {
 
     if (featureCount !== info.inputDim) {
       return res.status(400).json({
-        // 👇 aquí deben ir backticks `
+        
         error: `featureCount must be ${info.inputDim}, received ${featureCount}`
       });
     }
 
     if (!Array.isArray(features) || features.length !== info.inputDim) {
       return res.status(400).json({
-        // 👇 aquí también
+        
         error: `features must be an array of ${info.inputDim} numbers`
       });
     }
 
-    // 1) Inferencia con el modelo
+    //Inferencia con el modelo
     const prediction = await predict(features);
     const latencyMs = Date.now() - start;
     const ts = new Date();
 
-    // 2) Guardar en MongoDB
+    //Guardar en MongoDB
     const doc = await Prediction.create({
       dataId: dataId || null,
       prediction,
@@ -78,7 +78,7 @@ async function doPredict(req, res) {
       createdAt: ts
     });
 
-    // 3) Responder ya con persistencia
+    //Responder con persistencia
     res.status(201).json({
       predictionId: doc._id.toString(),
       prediction,
